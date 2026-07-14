@@ -271,7 +271,7 @@ def plot_drf(samples: np.ndarray, fs: float, t0_utc: datetime, channel: str,
 
 def main():
     if len(sys.argv) < 2:
-        data_dir = "D:\\Data\\Ham Radio\\HAMSci Local Experiments\\HF9930_K1FR_20260711_133801_narrowband_drf"
+        data_dir = "D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260628_194146_narrowband_drf"
         print(f"No path supplied; using default:\n  {data_dir}\n")
     else:
         data_dir = sys.argv[1].rstrip("/\\")

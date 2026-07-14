@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime, timezone
 
-drf_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\HF9930_K1FR_20260711_133801_narrowband_drf'
+drf_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260713_195209_narrowband_drf'
 do = drf.DigitalRFReader(drf_path)
 channel = do.get_channels()[0]
 

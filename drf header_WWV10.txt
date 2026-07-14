@@ -1,0 +1,24 @@
+Available channels: ['ch0']
+
+Properties for channel ch0:
+  H5Tget_class: 1
+  H5Tget_offset: 0
+  H5Tget_order: 0
+  H5Tget_precision: 32
+  H5Tget_size: 4
+  digital_rf_time_description: All times in this format are in number of samples since the epoch in the epoch attribute.  The first sample time will be sample_rate * UTC time at first sample.  Attribute init_utc_timestamp records this init UTC time so that a conversion to any other time is possible given the number of leapseconds difference at init_utc_timestamp.  Leapseconds that occur during data recording are included in the data.
+  digital_rf_version: 2.6.0
+  epoch: 1970-01-01T00:00:00Z
+  file_cadence_millisecs: 180000
+  is_complex: 1
+  is_continuous: 1
+  num_subchannels: 1
+  sample_rate_denominator: 1
+  sample_rate_numerator: 10
+  subdir_cadence_secs: 3600
+  samples_per_second: 10.0
+
+Data Bounds (Sample Indices):
+  Start Index: 17839866600
+  End Index:   17840318399
+Time 17839868022: {'capture_start_sample': 17839868022, 'center_frequencies': 10000000.0, 'lat': 38.8, 'long': -77.1, 'rx_station': 'K1FR', 'sample_count': 449990, 'sample_rate_hz': 10.0, 'tx_station': 'WWV10'}

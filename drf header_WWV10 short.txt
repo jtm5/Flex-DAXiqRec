@@ -19,6 +19,6 @@ Properties for channel ch0:
   samples_per_second: 10.0
 
 Data Bounds (Sample Indices):
-  Start Index: 17834468400
-  End Index:   17834475599
-Time 17834468402: {'capture_start_sample': 17834468402, 'center_frequencies': 630000.0, 'lat': 38.8, 'long': -77.1, 'rx_station': 'k1fr', 'sample_count': 6000, 'sample_rate_hz': 10.0, 'tx_station': 'WWV10'}
+  Start Index: 17839776600
+  End Index:   17839780199
+Time 17839776887: {'capture_start_sample': 17839776887, 'center_frequencies': 10000000.0, 'lat': 38.8, 'long': -77.1, 'rx_station': 'K1FR', 'sample_count': 2990, 'sample_rate_hz': 10.0, 'tx_station': 'WWV10'}
