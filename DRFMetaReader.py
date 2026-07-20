@@ -7,7 +7,7 @@ def print_to_File(filename, content):
         f.write(content)
 
 # 1. Initialize the reader with the path to your dataset
-dataset_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260713_195209_narrowband_drf'
+dataset_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\HF DOPPLER ANALYSIS\\Good CHU7 Results\\LOOK AT THE IQ CONSTELLATION PLOTS!!!\\CHU7_K1FR_20260620_194601_narrowband_drf'
 reader = drf.DigitalRFReader(dataset_path)
 
 # 2. Get all available channels in the dataset
@@ -31,7 +31,7 @@ print_to_File(filename, f"  Start Index: {start_index}\r\n")
 print_to_File(filename, f"  End Index:   {end_index}\r\n")
 
 # Initialize the metadata reader directly pointing to the metadata folder
-metadata_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260713_195209_narrowband_drf\\ch0\\metadata'
+metadata_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\HF DOPPLER ANALYSIS\\Good CHU7 Results\\LOOK AT THE IQ CONSTELLATION PLOTS!!!\\CHU7_K1FR_20260620_194601_narrowband_drf\\ch0\\metadata'
 meta_reader = drf.DigitalMetadataReader(metadata_path)
 
 # Get the time bounds for which metadata exists (in seconds since epoch)

@@ -163,11 +163,13 @@ def plot_drf(samples: np.ndarray, fs: float, t0_utc: datetime, channel: str,
     # Try to parse centre frequency from folder name  (e.g. CHU7 → 7.335 MHz)
     dirname = os.path.basename(data_dir.rstrip("/\\"))
     if "CHU7" in dirname.upper():
-        freq_center = 7.335e6
+        freq_center = 7.850e6
     elif "CHU3" in dirname.upper():
         freq_center = 3.330e6
     elif "CHU14" in dirname.upper():
         freq_center = 14.670e6
+    elif "WWV10" in dirname.upper():
+        freq_center = 10.000e6
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 9))
     fig.suptitle(
@@ -181,10 +183,6 @@ def plot_drf(samples: np.ndarray, fs: float, t0_utc: datetime, channel: str,
     ax = axes[0, 0]
     # Downsample for the spectrogram if very long
     
-#########################################################################################
-    # samples = samples * 100.0
-#####################################################################################
-
 
     spec_samples = samples
     if len(samples) > 2_000_000:
@@ -204,7 +202,7 @@ def plot_drf(samples: np.ndarray, fs: float, t0_utc: datetime, channel: str,
     ax.set_title("Spectrogram")
     # fix y-tick labels to show real frequency
     yticks = ax.get_yticks()
-    ax.set_yticklabels([f"{(y + freq_center)/1e6:.4f}" for y in yticks])
+    # ax.set_yticklabels([f"{(y + freq_center)/1e6:.4f}" for y in yticks])
     plt.colorbar(im, ax=ax, label="Power (dB)")
 
     # ── 2. Power Spectral Density ────────────────────────────────────────────
@@ -271,7 +269,7 @@ def plot_drf(samples: np.ndarray, fs: float, t0_utc: datetime, channel: str,
 
 def main():
     if len(sys.argv) < 2:
-        data_dir = "D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260628_194146_narrowband_drf"
+        data_dir = "D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260717_194631_narrowband_drf"
         print(f"No path supplied; using default:\n  {data_dir}\n")
     else:
         data_dir = sys.argv[1].rstrip("/\\")

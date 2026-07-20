@@ -1,10 +1,13 @@
 import digital_rf as drf
+from matplotlib.pylab import sample
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime, timezone
 
-drf_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260713_195209_narrowband_drf'
+from plot_drf import NFFT
+
+drf_path = 'D:\Data\Ham Radio\HAMSci Local Experiments\WWV10_K1FR_20260719_195254_narrowband_drf'
 do = drf.DigitalRFReader(drf_path)
 channel = do.get_channels()[0]
 
@@ -33,9 +36,9 @@ data = do.read_vector(start_sample, block_size, channel)
 
 # Reshape into (n_ffts, fft_size) and apply a window + FFT per slice
 window = np.hanning(fft_size)
-data = data[:n_ffts * fft_size].reshape(n_ffts, fft_size)
+data_reshaped = data[:n_ffts * fft_size].reshape(n_ffts, fft_size)
 
-spectrum = np.fft.fftshift(np.fft.fft(data * window, axis=1), axes=1)
+spectrum = np.fft.fftshift(np.fft.fft(data_reshaped * window, axis=1), axes=1)
 spectrogram = 20 * np.log10(np.abs(spectrum) + 1e-12)  # dB scale
 
 # Plot
@@ -48,25 +51,48 @@ sample_rate_f = float(sample_rate)
 start_time = datetime.fromtimestamp(start_sample / sample_rate_f, tz=timezone.utc)
 end_time = datetime.fromtimestamp((start_sample + n_ffts * fft_size) / sample_rate_f, tz=timezone.utc)
 
-plt.figure(figsize=(10, 6))
-plt.imshow(
-    spectrogram.T,
-    vmin= -50, vmax= 0,
-    aspect='auto',
-    origin='lower',
-    extent=[mdates.date2num(start_time), mdates.date2num(end_time), freqs[0], freqs[-1]],
-    cmap='viridis'
-)
-plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
-plt.xlabel('Time (UTC)')
-plt.ylabel('Frequency (Hz)')
-plt.colorbar(label='Power (dB)')
-plt.title(f'Spectrogram — channel: {channel}')
-plt.gcf().autofmt_xdate()
-plt.show()
+# plt.figure(figsize=(10, 6))
+# plt.imshow(
+#     spectrogram.T,
+#     vmin= -50, vmax= 0,
+#     aspect='auto',
+#     origin='lower',
+#     extent=[mdates.date2num(start_time), mdates.date2num(end_time), freqs[0], freqs[-1]],
+#     cmap='viridis'
+# )
+# plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+# plt.xlabel('Time (UTC)')
+# plt.ylabel('Frequency (Hz)')
+# plt.colorbar(label='Power (dB)')
+# plt.title(f'Spectrogram — channel: {channel}')
+# plt.gcf().autofmt_xdate()
+# # plt.show()
 
-# plt.plot(spectrogram)
-# plt.xlabel('Time (s)')
-# plt.ylabel('Power (dB)')
-# plt.title(f'Spectrogram Plot — channel: {channel}')
-# plt.show()
+
+
+NFFT          = 1024          # FFT size for spectrogram / PSD
+OVERLAP       = 512           # Overlap between STFT frames
+MAX_SAMPLES   = 10_000_000    # Cap for memory safety (~10 M samples)
+PLOT_IQ_LEN   = 10_000        # Samples shown in time-domain / constellation
+CMAP          = "rainbow"
+
+
+spec_start_time = datetime.fromtimestamp(start_sample / sample_rate_f, tz=timezone.utc)
+spec_end_time = datetime.fromtimestamp((start_sample + len(data)) / sample_rate_f, tz=timezone.utc)
+plt.figure(figsize=(10, 6))
+Pxx, freqs, bins, im = plt.specgram(
+    data, NFFT=NFFT, Fs=sample_rate, noverlap=OVERLAP,
+    cmap=CMAP, scale="dB", mode="psd",
+    xextent=(mdates.date2num(spec_start_time), mdates.date2num(spec_end_time))
+)
+
+plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+plt.gcf().autofmt_xdate()
+plt.xlabel("Time (UTC)")
+plt.ylabel("Frequency (Hz)")
+plt.title("Spectrogram\n" +drf_path)
+# fix y-tick labels to show real frequency
+yticks = plt.gca().get_yticks()
+# ax.set_yticklabels([f"{(y + freq_center)/1e6:.4f}" for y in yticks])
+plt.colorbar(im, label="Power (dB)")
+plt.show()
