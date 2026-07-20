@@ -10,6 +10,19 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
+            "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+            "cwd": "${fileDirname}",
+            "justMyCode": true,
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python Debugger: ridge.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "d:/Visual Studio SOURCE/ridge.py",
+            "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+            "cwd": "d:/Visual Studio SOURCE",
+            "justMyCode": true,
             "console": "integratedTerminal"
         }
     ]

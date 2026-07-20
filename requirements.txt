@@ -4,6 +4,7 @@ PyQt5
 soundfile
 digital_rf
 matplotlib
+scikit-image
 # sounddevice>=0.5 crashes with STATUS_HEAP_CORRUPTION on import/use on this machine
 # (reproduced in both a conda-forge env and a plain venv); 0.4.x works fine.
 sounddevice<0.5
