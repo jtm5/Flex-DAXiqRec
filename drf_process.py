@@ -9,7 +9,7 @@ from scipy.signal import spectrogram, butter, filtfilt
 
 
 
-drf_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260719_195254_narrowband_drf'
+drf_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260720_194948_narrowband_drf'
 do = drf.DigitalRFReader(drf_path)
 channel = do.get_channels()[0]
 
@@ -55,8 +55,6 @@ end_time = datetime.fromtimestamp((start_sample + n_ffts * fft_size) / sample_ra
 
 NFFT          = 1024          # FFT size for spectrogram / PSD
 OVERLAP       = 512           # Overlap between STFT frames
-MAX_SAMPLES   = 10_000_000    # Cap for memory safety (~10 M samples)
-PLOT_IQ_LEN   = 10_000        # Samples shown in time-domain / constellation
 CMAP          = "rainbow"
 
 
@@ -96,42 +94,31 @@ plt.colorbar(im, label="Power (dB)")
 plt.show()
 
 
-#######################################################################
-#  EXPERIMENTAL CODE
-#################################################################
+#########################################################################
+#  EXPERIMENTAL CODE LOOK FOR "VESSELIZATION" to find possible prop modes
+#########################################################################
 
-# ==========================================
-# 3. Hessian/Frangi Ridge Detection
-# ==========================================
+
 # Scale-space filtering: sigmas match the expected width of the spectrogram ridge
 sigmas = range(1, 4) 
 ridge_map = frangi(Pxx, sigmas=sigmas, black_ridges=False)
-# do a plot of the ridge map for visual inspection
-# plt.figure(figsize=(10, 6))
-# plt.imshow(ridge_map, aspect='auto', origin='lower', cmap='rainbow')
-# plt.colorbar(label="Ridge Intensity")
-# plt.title("Ridge Map (Normalized)")
-# plt.xlabel("Time Bin")
-# plt.ylabel("Frequency Bin")
-# plt.show()
+
 
 # Normalize the ridge map for easier peak tracking
 ridge_map_normalized = (ridge_map - np.min(ridge_map)) / (np.max(ridge_map) - np.min(ridge_map))
 
-# ==========================================
-# 4. Extract and Track the Ridge Path
-# ==========================================
+
 # For each time bin, locate the peak of the ridge map
+#### WARNING: This is a crude ridge tracking method based on the maximum response in the Frangi-filtered map. 
+# The argmax() will kill the ability to find multiple ridges within the same time bin.
 tracked_freq_indices = np.argmax(ridge_map_normalized, axis=0)
 tracked_frequencies = freqs[tracked_freq_indices]
 
-# Optional: Apply a low-pass Butterworth filter to smooth tracking anomalies
+# Apply a low-pass Butterworth filter to smooth tracking anomalies
 b, a = butter(3, 0.1)
 smoothed_tracked_frequencies = filtfilt(b, a, tracked_frequencies)
 
-# ==========================================
-# 5. Visualizing the Process
-# ==========================================
+
 fig, axes = plt.subplots(3, 1, figsize=(10, 10), sharex=True)
 
 # Use the spectrogram time-bin centers returned by specgram.
@@ -157,8 +144,8 @@ axes[0].set_ylabel("Frequency (Hz)")
 fig.colorbar(im0, ax=axes[0], label="Power (dB)")
 
 # Plot Isolated Ridge Map
-im1 = axes[1].pcolormesh(times, freqs, ridge_map_normalized, shading='none', cmap='rainbow',vmin=pxx_vmin, vmax=pxx_vmax)
-axes[1].set_title("2. Frangi Filter Ridge Map (Background Noise Removed)")
+im1 = axes[1].pcolormesh(times, freqs, ridge_map, shading='none', cmap='rainbow',vmin=pxx_vmin, vmax=pxx_vmax)
+axes[1].set_title("2. Frangi Filter Ridge Map")
 axes[1].set_ylabel("Frequency (Hz)")
 fig.colorbar(im1, ax=axes[1], label="Ridge Intensity")
 
