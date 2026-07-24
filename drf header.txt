@@ -254,3 +254,28 @@ Data Bounds (Sample Indices):
   End Index:   17845919999
 Time 17845056000: {'callsign': 'W2NAF-2', 'center_frequencies': array([ 0.06,  2.5 ,  3.33,  5.  ,  7.85, 10.  , 14.67, 15.  , 20.  ,
        25.  ]), 'grid_square': 'FN21ei', 'lat': 41.33333206176758, 'long': -75.66666412353516, 'receiver_name': 'KA9Q_0_WWV', 'uuid_str': '3b47d8ff0d0f4e1d833ca5dbf908888b'}
+Available channels: ['ch0']
+
+Properties for channel ch0:
+  H5Tget_class: 1
+  H5Tget_offset: 0
+  H5Tget_order: 0
+  H5Tget_precision: 32
+  H5Tget_size: 4
+  digital_rf_time_description: All times in this format are in number of samples since the epoch in the epoch attribute.  The first sample time will be sample_rate * UTC time at first sample.  Attribute init_utc_timestamp records this init UTC time so that a conversion to any other time is possible given the number of leapseconds difference at init_utc_timestamp.  Leapseconds that occur during data recording are included in the data.
+  digital_rf_version: 2.6.0
+  epoch: 1970-01-01T00:00:00Z
+  file_cadence_millisecs: 3600000
+  is_complex: 1
+  is_continuous: 1
+  num_subchannels: 10
+  sample_rate_denominator: 1
+  sample_rate_numerator: 10
+  subdir_cadence_secs: 86400
+  samples_per_second: 10.0
+
+Data Bounds (Sample Indices):
+  Start Index: 17845056000
+  End Index:   17845919999
+Time 17845056000: {'callsign': 'W2NAF-2', 'center_frequencies': array([ 0.06,  2.5 ,  3.33,  5.  ,  7.85, 10.  , 14.67, 15.  , 20.  ,
+       25.  ]), 'grid_square': 'FN21ei', 'lat': 41.33333206176758, 'long': -75.66666412353516, 'receiver_name': 'KA9Q_0_WWV', 'uuid_str': '3b47d8ff0d0f4e1d833ca5dbf908888b'}

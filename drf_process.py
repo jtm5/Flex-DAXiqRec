@@ -1,3 +1,4 @@
+import os
 import digital_rf as drf
 from matplotlib.pylab import sample
 import numpy as np
@@ -12,12 +13,38 @@ from skimage.exposure import rescale_intensity
 
 
 
-drf_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260723_194902_narrowband_drf'
+drf_path = 'C:\\Users\\tmcma\\Downloads\\OBS2026-07-20T00-00'
+TARGET_FREQ_HZ = 10_000_000  # which subchannel (frequency, Hz) to process -- only matters for multi-subchannel (PSWS-style) datasets
+
 do = drf.DigitalRFReader(drf_path)
 channel = do.get_channels()[0]
 
 props = do.get_properties(channel)
 sample_rate = props['samples_per_second']
+
+# PSWS-style datasets pack several monitored frequencies as subchannels of
+# one DRF channel (see psws_drf_subchannels note) -- read_vector() then
+# returns a 2D (samples, num_subchannels) array instead of the 1D array our
+# own single-frequency captures produce. Figure out which column to analyze.
+num_subchannels = int(props.get('num_subchannels', 1))
+subchannel_index = 0
+if num_subchannels > 1:
+    meta_reader = drf.DigitalMetadataReader(os.path.join(drf_path, channel, "metadata"))
+    meta_start, meta_end = meta_reader.get_bounds()
+    latest_meta = meta_reader.read(meta_end, meta_end)[meta_end]
+    center_frequencies = np.asarray(latest_meta['center_frequencies'], dtype=np.float64)
+    # Units vary by writer -- our own DRFs store center_frequencies in Hz,
+    # this PSWS sample stores it in MHz. Normalize to Hz before comparing.
+    center_frequencies_hz = np.where(center_frequencies < 1000, center_frequencies * 1e6, center_frequencies)
+
+    subchannel_index = int(np.argmin(np.abs(center_frequencies_hz - TARGET_FREQ_HZ)))
+    matched_freq_hz = center_frequencies_hz[subchannel_index]
+    print(f"Subchannels available (Hz): {center_frequencies_hz}")
+    print(f"Selected subchannel {subchannel_index}: {matched_freq_hz / 1e6:.4f} MHz "
+          f"(callsign={latest_meta.get('callsign')}, receiver_name={latest_meta.get('receiver_name')})")
+    if abs(matched_freq_hz - TARGET_FREQ_HZ) > 50_000:
+        print(f"Warning: nearest subchannel is {abs(matched_freq_hz - TARGET_FREQ_HZ) / 1e3:.1f} kHz "
+              f"away from requested TARGET_FREQ_HZ={TARGET_FREQ_HZ} -- check TARGET_FREQ_HZ.")
 
 start_sample, end_sample = do.get_bounds(channel)
 
@@ -38,6 +65,8 @@ n_ffts = min(7200, available_ffts)        # how many time-slices to compute, cap
 block_size = fft_size * n_ffts    # total samples to read for this view
 
 data = do.read_vector(start_sample, block_size, channel)
+if data.ndim > 1:
+    data = data[:, subchannel_index]
 # plot the amplitude of the raw data
 plt.figure(figsize=(10, 4))
 plt.plot(np.arange(len(data)) / sample_rate, np.abs(data))

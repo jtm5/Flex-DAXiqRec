@@ -35,6 +35,9 @@ fs = 48000  # sample rate
 REC_DURATION = 10    # this sets recording duration in seconds
 TX_STATION = "WWV10"
 RX_STATION = ""
+GRID_SQUARE = ""
+RECEIVER_NAME = ""
+STATION_UUID = "HFDoppTool_narrowband"  # single station-identity string; used for the DRF dataset uuid_str and echoed into metadata
 CARRIER_FREQ_HZ = 10_000_000  # actual RF carrier in Hz; written to narrowband DRF metadata
 NARROWBAND_RATE = 10          # HamSCI narrow-band output rate (sps)
 
@@ -54,8 +57,12 @@ class SettingsDialog(QDialog):
 
         self.tx_station_edit = QLineEdit(TX_STATION)
         self.rx_station_edit = QLineEdit(RX_STATION)
+        self.grid_square_edit = QLineEdit(GRID_SQUARE)
+        self.receiver_name_edit = QLineEdit(RECEIVER_NAME)
         form.addRow("Transmitter Station:", self.tx_station_edit)
-        form.addRow("Receiver Station:", self.rx_station_edit)
+        form.addRow("Receiver Station (callsign):", self.rx_station_edit)
+        form.addRow("Grid Square:", self.grid_square_edit)
+        form.addRow("Receiver Name:", self.receiver_name_edit)
 
         self.spin_center_freq = QSpinBox()
         self.spin_center_freq.setRange(100_000, 30_000_000)
@@ -80,11 +87,13 @@ class SettingsDialog(QDialog):
         self.setLayout(layout)
 
     def apply_to_globals(self):
-        global REC_DURATION, TX_STATION, RX_STATION, CARRIER_FREQ_HZ
+        global REC_DURATION, TX_STATION, RX_STATION, CARRIER_FREQ_HZ, GRID_SQUARE, RECEIVER_NAME
         TX_STATION       = self.tx_station_edit.text().strip()
         RX_STATION       = self.rx_station_edit.text().strip()
         CARRIER_FREQ_HZ  = self.spin_center_freq.value()
         REC_DURATION     = self.spin_duration.value()
+        GRID_SQUARE      = self.grid_square_edit.text().strip()
+        RECEIVER_NAME    = self.receiver_name_edit.text().strip()
 
 
 RECORDING_DIR = "D:\\Data\\Ham Radio\\HAMSci Local Experiments"
@@ -193,7 +202,7 @@ drf_writer = drf.DigitalRFWriter(
     start_global_index,
     NARROWBAND_RATE,
     1,
-    uuid_str="HFDoppTool_narrowband",
+    uuid_str=STATION_UUID,
     compression_level=0,
     checksum=False,
     is_complex=True,
@@ -234,14 +243,16 @@ metadata_writer = drf.DigitalMetadataWriter(
 metadata_writer.write(
     start_global_index,
     {
+        "callsign": RX_STATION,
         "center_frequencies": np.array([CARRIER_FREQ_HZ], dtype=np.float64),
+        "grid_square": GRID_SQUARE,
         "lat": np.float64(38.8),
         "long": np.float64(-77.1),
+        "receiver_name": RECEIVER_NAME,
+        "uuid_str": STATION_UUID,
         "capture_start_sample": np.int64(start_global_index),
         "sample_rate_hz": np.float64(NARROWBAND_RATE),
         "sample_count": np.int64(samples_written),
-        "tx_station": TX_STATION,
-        "rx_station": RX_STATION,
     },
 )
 print(f"Saved narrow-band DRF ({samples_written} samples @ {NARROWBAND_RATE} sps): {NARROWBAND_DRF_PATH}")
