@@ -12,7 +12,7 @@ from skimage.exposure import rescale_intensity
 
 
 
-drf_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\HF DOPPLER ANALYSIS\\Good CHU7 Results\\LOOK AT THE IQ CONSTELLATION PLOTS!!!\\CHU7_K1FR_20260621_192006_narrowband_drf\\CHU7_K1FR_20260621_192006_narrowband_drf'
+drf_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260723_194902_narrowband_drf'
 do = drf.DigitalRFReader(drf_path)
 channel = do.get_channels()[0]
 
@@ -38,6 +38,13 @@ n_ffts = min(7200, available_ffts)        # how many time-slices to compute, cap
 block_size = fft_size * n_ffts    # total samples to read for this view
 
 data = do.read_vector(start_sample, block_size, channel)
+# plot the amplitude of the raw data
+plt.figure(figsize=(10, 4))
+plt.plot(np.arange(len(data)) / sample_rate, np.abs(data))
+plt.xlabel('Time [s]')
+plt.ylabel('Amplitude')
+plt.title('Amplitude of Raw Data')
+plt.show()
 
 # Reshape into (n_ffts, fft_size) and apply a window + FFT per slice
 window = np.hanning(fft_size)

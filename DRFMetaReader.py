@@ -7,11 +7,14 @@ def print_to_File(filename, content):
         f.write(content)
 
 # 1. Initialize the reader with the path to your dataset
-dataset_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\HF DOPPLER ANALYSIS\\Good CHU7 Results\\LOOK AT THE IQ CONSTELLATION PLOTS!!!\\CHU7_K1FR_20260620_194601_narrowband_drf'
+dataset_path = 'C:\\Users\\tmcma\\Downloads\\OBS2026-07-20T00-00'
 reader = drf.DigitalRFReader(dataset_path)
 
 # 2. Get all available channels in the dataset
 channels = reader.get_channels()
+print(f"Available channels: {channels}")
+for channel in channels:
+    print(f"Channel: {channel}", reader.get_properties(channel),"\r\n")
 print_to_File(filename, f"Available channels: {channels}\r\n")
 # print_to_File("drf header.txt", f"Available channels: {channels}")
 # print_to_File("drf header.txt", f"Available channels: {channels}")
@@ -24,6 +27,19 @@ print_to_File(filename, f"\nProperties for channel {channel}:\r\n")
 for key, value in properties.items():
     print_to_File(filename, f"  {key}: {value}\r\n")
 
+# Inspect metadata dictionary for subchannel-specific metadata entries
+meta_reader = drf.DigitalMetadataReader("C:\\Users\\tmcma\\Downloads\\OBS2026-07-20T00-00\\ch0\\metadata")
+bounds = meta_reader.get_bounds()
+if bounds[0] is not None:
+    # Read the latest metadata entry
+    latest_sample = bounds[1]
+    metadata_dict = meta_reader.read(latest_sample, latest_sample)
+    print("Subchannel Metadata Dictionary:")
+    for key, val in metadata_dict[latest_sample].items():
+        print(f"  {key}: {val}")
+else:
+    print("No metadata records found in range.")
+
 # 4. Get the time/sample bounds of the data
 start_index, end_index = reader.get_bounds(channel)
 print_to_File(filename, f"\nData Bounds (Sample Indices):\r\n")
@@ -31,7 +47,7 @@ print_to_File(filename, f"  Start Index: {start_index}\r\n")
 print_to_File(filename, f"  End Index:   {end_index}\r\n")
 
 # Initialize the metadata reader directly pointing to the metadata folder
-metadata_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\HF DOPPLER ANALYSIS\\Good CHU7 Results\\LOOK AT THE IQ CONSTELLATION PLOTS!!!\\CHU7_K1FR_20260620_194601_narrowband_drf\\ch0\\metadata'
+metadata_path = 'C:\\Users\\tmcma\\Downloads\\OBS2026-07-20T00-00\\ch0\\metadata'
 meta_reader = drf.DigitalMetadataReader(metadata_path)
 
 # Get the time bounds for which metadata exists (in seconds since epoch)
