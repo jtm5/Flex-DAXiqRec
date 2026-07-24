@@ -13,7 +13,7 @@ from skimage.exposure import rescale_intensity
 
 
 
-drf_path = 'C:\\Users\\tmcma\\Downloads\\OBS2026-07-20T00-00'
+drf_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260724_190052_narrowband_drf'
 TARGET_FREQ_HZ = 10_000_000  # which subchannel (frequency, Hz) to process -- only matters for multi-subchannel (PSWS-style) datasets
 
 do = drf.DigitalRFReader(drf_path)

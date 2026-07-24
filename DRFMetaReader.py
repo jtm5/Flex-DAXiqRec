@@ -7,7 +7,7 @@ def print_to_File(filename, content):
         f.write(content)
 
 # 1. Initialize the reader with the path to your dataset
-dataset_path = 'C:\\Users\\tmcma\\Downloads\\OBS2026-07-20T00-00'
+dataset_path = 'D:\Data\Ham Radio\HAMSci Local Experiments\WWV10_K1FR_20260724_190052_narrowband_drf'
 reader = drf.DigitalRFReader(dataset_path)
 
 # 2. Get all available channels in the dataset
@@ -28,7 +28,7 @@ for key, value in properties.items():
     print_to_File(filename, f"  {key}: {value}\r\n")
 
 # Inspect metadata dictionary for subchannel-specific metadata entries
-meta_reader = drf.DigitalMetadataReader("C:\\Users\\tmcma\\Downloads\\OBS2026-07-20T00-00\\ch0\\metadata")
+meta_reader = drf.DigitalMetadataReader("D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260724_190052_narrowband_drf\\ch0\\metadata")
 bounds = meta_reader.get_bounds()
 if bounds[0] is not None:
     # Read the latest metadata entry
@@ -45,10 +45,6 @@ start_index, end_index = reader.get_bounds(channel)
 print_to_File(filename, f"\nData Bounds (Sample Indices):\r\n")
 print_to_File(filename, f"  Start Index: {start_index}\r\n")
 print_to_File(filename, f"  End Index:   {end_index}\r\n")
-
-# Initialize the metadata reader directly pointing to the metadata folder
-metadata_path = 'C:\\Users\\tmcma\\Downloads\\OBS2026-07-20T00-00\\ch0\\metadata'
-meta_reader = drf.DigitalMetadataReader(metadata_path)
 
 # Get the time bounds for which metadata exists (in seconds since epoch)
 start_time, end_time = meta_reader.get_bounds()
