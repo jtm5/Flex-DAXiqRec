@@ -13,7 +13,7 @@ from skimage.exposure import rescale_intensity
 
 
 
-drf_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260724_190052_narrowband_drf'
+drf_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WMAL_K1FR_20260725_165304_narrowband_drf'
 TARGET_FREQ_HZ = 10_000_000  # which subchannel (frequency, Hz) to process -- only matters for multi-subchannel (PSWS-style) datasets
 
 do = drf.DigitalRFReader(drf_path)
@@ -99,12 +99,25 @@ CMAP          = "rainbow"
 
 spec_start_time = datetime.fromtimestamp(start_sample / sample_rate_f, tz=timezone.utc)
 spec_end_time = datetime.fromtimestamp((start_sample + len(data)) / sample_rate_f, tz=timezone.utc)
+
+
 plt.figure(figsize=(10, 6))
 Pxx, freqs, bins, im = plt.specgram(
     data, NFFT=NFFT, Fs=sample_rate, noverlap=OVERLAP,
     cmap=CMAP, scale="dB", mode="psd",
     xextent=(mdates.date2num(spec_start_time), mdates.date2num(spec_end_time))
 )
+
+plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+plt.gcf().autofmt_xdate()
+plt.xlabel("Time (UTC)")
+plt.ylabel("Frequency (Hz)")
+plt.title("Spectrogram\n" +drf_path)
+# fix y-tick labels to show real frequency
+yticks = plt.gca().get_yticks()
+# ax.set_yticklabels([f"{(y + freq_center)/1e6:.4f}" for y in yticks])
+plt.colorbar(im, label="Power (dB)")
+plt.show()
 
 # get_continuous_blocks() doesn't catch every internal dropout -- DigitalRF
 # still fills genuinely missing samples with NaN inside a nominally
@@ -121,22 +134,12 @@ if nan_cols.any():
     for row in range(Pxx.shape[0]):
         Pxx[row, nan_cols] = np.interp(x[nan_cols], x[good_cols], Pxx[row, good_cols])
 
-plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
-plt.gcf().autofmt_xdate()
-plt.xlabel("Time (UTC)")
-plt.ylabel("Frequency (Hz)")
-plt.title("Spectrogram\n" +drf_path)
-# fix y-tick labels to show real frequency
-yticks = plt.gca().get_yticks()
-# ax.set_yticklabels([f"{(y + freq_center)/1e6:.4f}" for y in yticks])
-plt.colorbar(im, label="Power (dB)")
-plt.show()
-
 # Robust color limits (shared by all spectrogram-backed plots below) so a
 # few outlier bins don't wash out the color scale.
 pxx_vmin, pxx_vmax = np.nanpercentile(Pxx, [5, 99])
 if not np.isfinite(pxx_vmin) or not np.isfinite(pxx_vmax) or pxx_vmax <= pxx_vmin:
     pxx_vmin, pxx_vmax = np.nanmin(Pxx), np.nanmax(Pxx)
+
 
 
 #########################################################################

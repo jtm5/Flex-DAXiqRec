@@ -37,7 +37,7 @@ TX_STATION = "WWV10"
 RX_STATION = ""
 GRID_SQUARE = ""
 RECEIVER_NAME = ""
-STATION_UUID = "HFDoppTool_narrowband"  # single station-identity string; used for the DRF dataset uuid_str and echoed into metadata
+STATION_UUID = "NoneAssigned"  # single station-identity string; used for the DRF dataset uuid_str and echoed into metadata
 CARRIER_FREQ_HZ = 10_000_000  # actual RF carrier in Hz; written to narrowband DRF metadata
 NARROWBAND_RATE = 10          # HamSCI narrow-band output rate (sps)
 

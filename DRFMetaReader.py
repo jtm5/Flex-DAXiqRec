@@ -7,7 +7,7 @@ def print_to_File(filename, content):
         f.write(content)
 
 # 1. Initialize the reader with the path to your dataset
-dataset_path = 'D:\Data\Ham Radio\HAMSci Local Experiments\WWV10_K1FR_20260724_190052_narrowband_drf'
+dataset_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\OBS2026-07-20T00-00'
 reader = drf.DigitalRFReader(dataset_path)
 
 # 2. Get all available channels in the dataset
@@ -28,7 +28,7 @@ for key, value in properties.items():
     print_to_File(filename, f"  {key}: {value}\r\n")
 
 # Inspect metadata dictionary for subchannel-specific metadata entries
-meta_reader = drf.DigitalMetadataReader("D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV10_K1FR_20260724_190052_narrowband_drf\\ch0\\metadata")
+meta_reader = drf.DigitalMetadataReader("D:\\Data\\Ham Radio\\HAMSci Local Experiments\\OBS2026-07-20T00-00\\ch0\\metadata")
 bounds = meta_reader.get_bounds()
 if bounds[0] is not None:
     # Read the latest metadata entry
