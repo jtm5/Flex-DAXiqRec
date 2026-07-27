@@ -1,4 +1,12 @@
+import os
+
 import digital_rf as drf
+from PyQt5.QtWidgets import QApplication, QFileDialog
+from skimage.filters import frangi, threshold_otsu
+from skimage.measure import label, regionprops
+from scipy.signal import spectrogram, butter, filtfilt, find_peaks
+from skimage.exposure import rescale_intensity
+
 
 filename = "drf header.txt"
 
@@ -6,11 +14,17 @@ def print_to_File(filename, content):
     with open(filename, "a") as f:
         f.write(content)
 
-# 1. Initialize the reader with the path to your dataset
-dataset_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV15_K1FR_20260727_103022_narrowband_drf'
+# Initialize the reader with the path to your dataset
+# add a PyQt file selection dialong to chose he location and name for the DRF
+app = QApplication([])
+DEFAULT_DRF_DIR = r"D:\\Data\\Ham Radio\\HAMSci Local Experiments"
+initial_dir = DEFAULT_DRF_DIR if os.path.isdir(DEFAULT_DRF_DIR) else os.path.expanduser("~")
+drf_path = QFileDialog.getExistingDirectory(None, "Select DRF Directory", initial_dir)
+dataset_path = drf_path
 reader = drf.DigitalRFReader(dataset_path)
 
-# 2. Get all available channels in the dataset
+
+# Get all available channels in the dataset
 channels = reader.get_channels()
 print(f"Available channels: {channels}")
 for channel in channels:
@@ -21,7 +35,7 @@ print_to_File(filename, f"Available channels: {channels}\r\n")
 # Let's inspect the first available channel
 channel = channels[0]
 
-# 3. Get channel properties (e.g., sample rate, center frequency)
+# Get channel properties (e.g., sample rate, center frequency)
 properties = reader.get_properties(channel)
 print_to_File(filename, f"\nProperties for channel {channel}:\r\n")
 for key, value in properties.items():
@@ -35,7 +49,7 @@ for key, value in properties.items():
 # than the bounds check below.
 meta_reader = None
 try:
-    meta_reader = drf.DigitalMetadataReader("D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV15_K1FR_20260727_103022_narrowband_drf\\ch0\\metadata")
+    meta_reader = drf.DigitalMetadataReader(os.path.join(drf_path, "ch0", "metadata"))
 except OSError as e:
     print(f"No metadata available for this dataset ({e}). "
           f"Likely an interrupted recording -- RF data may still be usable.")
@@ -52,7 +66,7 @@ if meta_reader is not None:
     else:
         print("No metadata records found in range.")
 
-# 4. Get the time/sample bounds of the data
+# Get the time/sample bounds of the data
 start_index, end_index = reader.get_bounds(channel)
 print_to_File(filename, f"\nData Bounds (Sample Indices):\r\n")
 print_to_File(filename, f"  Start Index: {start_index}\r\n")

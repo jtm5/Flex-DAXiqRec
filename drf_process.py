@@ -71,14 +71,7 @@ block_size = fft_size * n_ffts    # total samples to read for this view
 data = do.read_vector(start_sample, block_size, channel)
 if data.ndim > 1:
     data = data[:, subchannel_index]
-# plot the amplitude of the raw data
-# only plot every 10th sample
-# plt.figure(figsize=(10, 4))
-# plt.plot(np.arange(len(data))[::10] / sample_rate, np.abs(data)[::10])
-# plt.xlabel('Time [s]')
-# plt.ylabel('Amplitude')
-# plt.title('Amplitude of Raw Data')
-# plt.show()
+
 
 # Reshape into (n_ffts, fft_size) and apply a window + FFT per slice
 window = np.hanning(fft_size)
@@ -134,7 +127,14 @@ fig.colorbar(im, cax=ax_cbar, label="Power (dB)")
 mag_time_axis = np.linspace(
     mdates.date2num(spec_start_time), mdates.date2num(spec_end_time), len(data)
 )
-ax_mag.plot(mag_time_axis, np.abs(data), linewidth=0.5)
+MAG_AVG_WINDOW = 500  # samples averaged into each plotted amplitude point
+
+# Smooth with a rolling average, then only plot one point per window, rather
+# than a straight every-Nth-sample decimation -- each plotted point reflects
+# a local average instead of landing on one arbitrary raw sample.
+magnitude = np.abs(data)
+smoothed_magnitude = np.convolve(magnitude, np.ones(MAG_AVG_WINDOW) / MAG_AVG_WINDOW, mode='same')
+ax_mag.plot(mag_time_axis[::MAG_AVG_WINDOW], smoothed_magnitude[::MAG_AVG_WINDOW], linewidth=0.7)
 ax_mag.set_ylabel("Amplitude")
 ax_mag.set_title("Magnitude of Raw Data")
 ax_mag.set_xlabel("Time (UTC)")
