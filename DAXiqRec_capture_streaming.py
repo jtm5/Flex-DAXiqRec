@@ -211,6 +211,46 @@ drf_writer = drf.DigitalRFWriter(
     marching_periods=True,
 )
 
+# Metadata is written twice: an immediate provisional record (sample_count=0)
+# right here, and a final one with the true count once the recording ends
+# (see the finally block below). This exists because VS Code's debug "Stop"
+# button (and other hard kills) terminates the process directly -- Python
+# never runs any try/finally in that case, so the finally-block write never
+# executes. The provisional record guarantees dmd_properties.h5 and at least
+# one valid entry exist from the very start, so the dataset stays readable
+# even if the run gets killed outright. A Ctrl+C in the actual console
+# window (not the IDE Stop button) still raises a catchable
+# KeyboardInterrupt and gets the accurate final write via finally.
+metadata_writer = drf.DigitalMetadataWriter(
+    metadata_dir,
+    DRF_SUBDIR_CADENCE_SECS,
+    DRF_METADATA_FILE_CADENCE_SECS,
+    NARROWBAND_RATE,
+    1,
+    "metadata",
+)
+
+
+def _write_metadata(sample_index, count):
+    metadata_writer.write(
+        sample_index,
+        {
+            "callsign": RX_STATION,
+            "center_frequencies": np.array([CARRIER_FREQ_HZ], dtype=np.float64),
+            "grid_square": GRID_SQUARE,
+            "lat": np.float64(38.8),
+            "long": np.float64(-77.1),
+            "receiver_name": RECEIVER_NAME,
+            "uuid_str": STATION_UUID,
+            "capture_start_sample": np.int64(start_global_index),
+            "sample_rate_hz": np.float64(NARROWBAND_RATE),
+            "sample_count": np.int64(count),
+        },
+    )
+
+
+_write_metadata(start_global_index, 0)
+
 decimator = StreamingNarrowbandDecimator(fs, NARROWBAND_RATE)
 samples_written = 0
 
@@ -231,28 +271,7 @@ try:
         sd.sleep(int(REC_DURATION * 1000))
 finally:
     drf_writer.close()
-
-metadata_writer = drf.DigitalMetadataWriter(
-    metadata_dir,
-    DRF_SUBDIR_CADENCE_SECS,
-    DRF_METADATA_FILE_CADENCE_SECS,
-    NARROWBAND_RATE,
-    1,
-    "metadata",
-)
-metadata_writer.write(
-    start_global_index,
-    {
-        "callsign": RX_STATION,
-        "center_frequencies": np.array([CARRIER_FREQ_HZ], dtype=np.float64),
-        "grid_square": GRID_SQUARE,
-        "lat": np.float64(38.8),
-        "long": np.float64(-77.1),
-        "receiver_name": RECEIVER_NAME,
-        "uuid_str": STATION_UUID,
-        "capture_start_sample": np.int64(start_global_index),
-        "sample_rate_hz": np.float64(NARROWBAND_RATE),
-        "sample_count": np.int64(samples_written),
-    },
-)
-print(f"Saved narrow-band DRF ({samples_written} samples @ {NARROWBAND_RATE} sps): {NARROWBAND_DRF_PATH}")
+    # Final, accurate record -- written at a later sample index than the
+    # provisional one above, so it's the one a reader sees as "latest".
+    _write_metadata(start_global_index + max(samples_written, 1), samples_written)
+    print(f"Saved narrow-band DRF ({samples_written} samples @ {NARROWBAND_RATE} sps): {NARROWBAND_DRF_PATH}")
