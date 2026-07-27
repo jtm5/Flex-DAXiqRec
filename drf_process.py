@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime, timezone
+from PyQt5.QtWidgets import QApplication, QFileDialog
 from skimage.filters import frangi, threshold_otsu
 from skimage.measure import label, regionprops
 from scipy.signal import spectrogram, butter, filtfilt, find_peaks
@@ -12,8 +13,11 @@ from skimage.exposure import rescale_intensity
 
 
 
-
-drf_path = 'D:\\Data\\Ham Radio\\HAMSci Local Experiments\\WWV15_K1FR_20260727_103022_narrowband_drf'
+# add a PyQt file selection dialong to chose he location and name for the DRF
+app = QApplication([])
+DEFAULT_DRF_DIR = r"D:\\Data\\Ham Radio\\HAMSci Local Experiments"
+initial_dir = DEFAULT_DRF_DIR if os.path.isdir(DEFAULT_DRF_DIR) else os.path.expanduser("~")
+drf_path = QFileDialog.getExistingDirectory(None, "Select DRF Directory", initial_dir)
 TARGET_FREQ_HZ = 10_000_000  # which subchannel (frequency, Hz) to process -- only matters for multi-subchannel (PSWS-style) datasets
 
 do = drf.DigitalRFReader(drf_path)
@@ -68,12 +72,13 @@ data = do.read_vector(start_sample, block_size, channel)
 if data.ndim > 1:
     data = data[:, subchannel_index]
 # plot the amplitude of the raw data
-plt.figure(figsize=(10, 4))
-plt.plot(np.arange(len(data)) / sample_rate, np.abs(data))
-plt.xlabel('Time [s]')
-plt.ylabel('Amplitude')
-plt.title('Amplitude of Raw Data')
-plt.show()
+# only plot every 10th sample
+# plt.figure(figsize=(10, 4))
+# plt.plot(np.arange(len(data))[::10] / sample_rate, np.abs(data)[::10])
+# plt.xlabel('Time [s]')
+# plt.ylabel('Amplitude')
+# plt.title('Amplitude of Raw Data')
+# plt.show()
 
 # Reshape into (n_ffts, fft_size) and apply a window + FFT per slice
 window = np.hanning(fft_size)
@@ -100,24 +105,48 @@ CMAP          = "rainbow"
 spec_start_time = datetime.fromtimestamp(start_sample / sample_rate_f, tz=timezone.utc)
 spec_end_time = datetime.fromtimestamp((start_sample + len(data)) / sample_rate_f, tz=timezone.utc)
 
+fig, axes = plt.subplots(
+    2, 2, figsize=(10, 8),
+    gridspec_kw={"width_ratios": [25, 1]},
+    constrained_layout=True,
+)
+ax_spec, ax_cbar = axes[0]
+ax_mag, ax_unused = axes[1]
+ax_mag.sharex(ax_spec)
+fig.delaxes(ax_unused)  # right column only exists to hold the colorbar next to ax_spec
 
-plt.figure(figsize=(10, 6))
-Pxx, freqs, bins, im = plt.specgram(
+Pxx, freqs, bins, im = ax_spec.specgram(
     data, NFFT=NFFT, Fs=sample_rate, noverlap=OVERLAP,
     cmap=CMAP, scale="dB", mode="psd",
     xextent=(mdates.date2num(spec_start_time), mdates.date2num(spec_end_time))
 )
+ax_spec.set_ylabel("Frequency (Hz)")
+ax_spec.set_title("Spectrogram\n" + drf_path)
+# cax=ax_cbar (rather than ax=ax_spec) pins the colorbar to its own dedicated
+# grid cell, which only spans the top row -- so its height matches ax_spec
+# alone, while ax_spec and ax_mag stay the same width (same gridspec column).
+fig.colorbar(im, cax=ax_cbar, label="Power (dB)")
 
-plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
-plt.gcf().autofmt_xdate()
-plt.xlabel("Time (UTC)")
-plt.ylabel("Frequency (Hz)")
-plt.title("Spectrogram\n" +drf_path)
-# fix y-tick labels to show real frequency
-yticks = plt.gca().get_yticks()
-# ax.set_yticklabels([f"{(y + freq_center)/1e6:.4f}" for y in yticks])
-plt.colorbar(im, label="Power (dB)")
+# Magnitude of the raw received samples, on the same time axis as the
+# spectrogram above -- interpolated between the same start/end timestamps
+# (rather than recomputed per-sample) so it lines up with the spectrogram's
+# xextent exactly.
+mag_time_axis = np.linspace(
+    mdates.date2num(spec_start_time), mdates.date2num(spec_end_time), len(data)
+)
+ax_mag.plot(mag_time_axis, np.abs(data), linewidth=0.5)
+ax_mag.set_ylabel("Amplitude")
+ax_mag.set_title("Magnitude of Raw Data")
+ax_mag.set_xlabel("Time (UTC)")
+ax_mag.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+
+ax_spec.label_outer()
+ax_mag.label_outer()
+fig.autofmt_xdate()
+
 plt.show()
+
+
 
 # get_continuous_blocks() doesn't catch every internal dropout -- DigitalRF
 # still fills genuinely missing samples with NaN inside a nominally
