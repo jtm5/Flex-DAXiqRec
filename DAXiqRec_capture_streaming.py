@@ -268,7 +268,14 @@ def _callback(indata, frames, time_info, status):
 
 try:
     with sd.InputStream(samplerate=fs, channels=2, blocksize=fs, callback=_callback):
-        sd.sleep(int(REC_DURATION * 1000))
+        # time.sleep(), not sd.sleep() -- sd.sleep() calls straight into
+        # PortAudio's C Pa_Sleep(), which Python's signal handling can't see
+        # into. A Ctrl+C during sd.sleep() gets silently deferred until the
+        # call returns on its own (i.e. the full REC_DURATION), making
+        # Ctrl+C look like it does nothing on anything but a very short
+        # recording. time.sleep() is implemented to check for pending
+        # signals and raises KeyboardInterrupt immediately.
+        time.sleep(REC_DURATION)
 finally:
     drf_writer.close()
     # Final, accurate record -- written at a later sample index than the
