@@ -18,7 +18,7 @@ app = QApplication([])
 DEFAULT_DRF_DIR = r"D:\\Data\\Ham Radio\\HAMSci Local Experiments"
 initial_dir = DEFAULT_DRF_DIR if os.path.isdir(DEFAULT_DRF_DIR) else os.path.expanduser("~")
 drf_path = QFileDialog.getExistingDirectory(None, "Select DRF Directory", initial_dir)
-TARGET_FREQ_HZ = 630_000 #15_000_000  # which subchannel (frequency, Hz) to process -- only matters for multi-subchannel (PSWS-style) datasets
+TARGET_FREQ_HZ = 20_000_000 #15_000_000  # which subchannel (frequency, Hz) to process -- only matters for multi-subchannel (PSWS-style) datasets
 
 do = drf.DigitalRFReader(drf_path)
 channel = do.get_channels()[0]

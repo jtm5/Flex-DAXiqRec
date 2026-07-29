@@ -103,15 +103,24 @@ CAPTURE_CHANNELS = [
         "pan_stream_id": "0x42000001",   # PLACEHOLDER -- verify against your SmartSDR session
         "dax_stream_id": "0x40000001",   # PLACEHOLDER -- verify against your SmartSDR session
     },
-    # {
-    #     "device_name": "DAX IQ 3",
-    #     "tx_station": "WWV15",
-    #     "carrier_freq_hz": 15_000_000,
-    #     "flex_slice": 2,
-    #     "dax_channel": 3,
-    #     "pan_stream_id": "0x42000002",   # PLACEHOLDER -- verify against your SmartSDR session
-    #     "dax_stream_id": "0x40000002",   # PLACEHOLDER -- verify against your SmartSDR session
-    # },
+    {
+        "device_name": "DAX IQ 3",
+        "tx_station": "WWV15",
+        "carrier_freq_hz": 15_000_000,
+        "flex_slice": 2,
+        "dax_channel": 3,
+        "pan_stream_id": "0x42000002",   # PLACEHOLDER -- verify against your SmartSDR session
+        "dax_stream_id": "0x40000002",   # PLACEHOLDER -- verify against your SmartSDR session
+    },
+        {
+        "device_name": "DAX IQ 4",
+        "tx_station": "WWV20",
+        "carrier_freq_hz": 20_000_000,
+        "flex_slice": 3,
+        "dax_channel": 4,
+        "pan_stream_id": "0x42000003",   # PLACEHOLDER -- verify against your SmartSDR session
+        "dax_stream_id": "0x40000003",   # PLACEHOLDER -- verify against your SmartSDR session
+    },
 ]
 
 

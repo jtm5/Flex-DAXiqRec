@@ -144,3 +144,53 @@ Data Bounds (Sample Indices):
   End Index:   17852704199
 Time 17852702168: {'callsign': '', 'capture_start_sample': 17852702168, 'center_frequencies': array([ 5000000., 10000000.]), 'grid_square': '', 'lat': 38.8, 'long': -77.1, 'receiver_name': '', 'sample_count': 0, 'sample_rate_hz': 10.0, 'uuid_str': 'NoneAssigned'}
 Time 17852703908: {'callsign': '', 'capture_start_sample': 17852702168, 'center_frequencies': array([ 5000000., 10000000.]), 'grid_square': '', 'lat': 38.8, 'long': -77.1, 'receiver_name': '', 'sample_count': 1740, 'sample_rate_hz': 10.0, 'uuid_str': 'NoneAssigned'}
+Available channels: ['ch0']
+
+Properties for channel ch0:
+  H5Tget_class: 1
+  H5Tget_offset: 0
+  H5Tget_order: 0
+  H5Tget_precision: 32
+  H5Tget_size: 4
+  digital_rf_time_description: All times in this format are in number of samples since the epoch in the epoch attribute.  The first sample time will be sample_rate * UTC time at first sample.  Attribute init_utc_timestamp records this init UTC time so that a conversion to any other time is possible given the number of leapseconds difference at init_utc_timestamp.  Leapseconds that occur during data recording are included in the data.
+  digital_rf_version: 2.6.0
+  epoch: 1970-01-01T00:00:00Z
+  file_cadence_millisecs: 180000
+  is_complex: 1
+  is_continuous: 1
+  num_subchannels: 2
+  sample_rate_denominator: 1
+  sample_rate_numerator: 10
+  subdir_cadence_secs: 3600
+  samples_per_second: 10.0
+
+Data Bounds (Sample Indices):
+  Start Index: 17852801400
+  End Index:   17852812199
+Time 17852802041: {'callsign': 'K1FR', 'capture_start_sample': 17852802041, 'center_frequencies': array([15000000.,   630000.]), 'grid_square': 'FM18kt', 'lat': 38.8, 'long': -77.1, 'receiver_name': 'Flex6700', 'sample_count': 0, 'sample_rate_hz': 10.0, 'uuid_str': 'NoneAssigned'}
+Time 17852811031: {'callsign': 'K1FR', 'capture_start_sample': 17852802041, 'center_frequencies': array([15000000.,   630000.]), 'grid_square': 'FM18kt', 'lat': 38.8, 'long': -77.1, 'receiver_name': 'Flex6700', 'sample_count': 8990, 'sample_rate_hz': 10.0, 'uuid_str': 'NoneAssigned'}
+Available channels: ['ch0']
+
+Properties for channel ch0:
+  H5Tget_class: 1
+  H5Tget_offset: 0
+  H5Tget_order: 0
+  H5Tget_precision: 32
+  H5Tget_size: 4
+  digital_rf_time_description: All times in this format are in number of samples since the epoch in the epoch attribute.  The first sample time will be sample_rate * UTC time at first sample.  Attribute init_utc_timestamp records this init UTC time so that a conversion to any other time is possible given the number of leapseconds difference at init_utc_timestamp.  Leapseconds that occur during data recording are included in the data.
+  digital_rf_version: 2.6.0
+  epoch: 1970-01-01T00:00:00Z
+  file_cadence_millisecs: 180000
+  is_complex: 1
+  is_continuous: 1
+  num_subchannels: 3
+  sample_rate_denominator: 1
+  sample_rate_numerator: 10
+  subdir_cadence_secs: 3600
+  samples_per_second: 10.0
+
+Data Bounds (Sample Indices):
+  Start Index: 17853309000
+  End Index:   17853316199
+Time 17853309039: {'callsign': 'K1FR', 'capture_start_sample': 17853309039, 'center_frequencies': array([  630000., 10000000., 15000000.]), 'grid_square': 'Fm18kt', 'lat': 38.8, 'long': -77.1, 'receiver_name': 'Flex6700', 'sample_count': 0, 'sample_rate_hz': 10.0, 'uuid_str': 'NoneAssigned'}
+Time 17853315029: {'callsign': 'K1FR', 'capture_start_sample': 17853309039, 'center_frequencies': array([  630000., 10000000., 15000000.]), 'grid_square': 'Fm18kt', 'lat': 38.8, 'long': -77.1, 'receiver_name': 'Flex6700', 'sample_count': 5990, 'sample_rate_hz': 10.0, 'uuid_str': 'NoneAssigned'}
