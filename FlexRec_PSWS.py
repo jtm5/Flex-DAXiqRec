@@ -162,9 +162,9 @@ class SettingsDialog(QDialog):
             self.channel_widgets.append((tx_edit, freq_spin))
 
         self.spin_duration = QSpinBox()
-        self.spin_duration.setRange(1, 86400)
+        self.spin_duration.setRange(1, 72)
         self.spin_duration.setValue(REC_DURATION)
-        self.spin_duration.setSuffix(" s")
+        self.spin_duration.setSuffix(" hr")
         form.addRow("Recording Duration", self.spin_duration)
 
         buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -181,7 +181,7 @@ class SettingsDialog(QDialog):
         RX_STATION    = self.rx_station_edit.text().strip()
         GRID_SQUARE   = self.grid_square_edit.text().strip()
         RECEIVER_NAME = self.receiver_name_edit.text().strip()
-        REC_DURATION  = self.spin_duration.value()
+        REC_DURATION  = self.spin_duration.value() * 3600
         # CAPTURE_CHANNELS entries are mutated in place -- no separate
         # globals needed for per-channel values.
         for chan, (tx_edit, freq_spin) in zip(CAPTURE_CHANNELS, self.channel_widgets):
