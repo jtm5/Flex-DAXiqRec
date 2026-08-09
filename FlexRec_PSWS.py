@@ -69,9 +69,11 @@ from TCP_Flex2 import start_telnet_client
 fs = 48000  # audio sample rate per DAX IQ channel
 
 REC_DURATION = 10    # this sets recording duration in seconds
-RX_STATION = ""
-GRID_SQUARE = ""
-RECEIVER_NAME = ""
+RX_STATION = "K1FR"  # HamSCI/PSWS receiver station callsign -- echoed into metadata
+GRID_SQUARE = "FM18kt"  # HamSCI/PSWS receiver station grid square -- echoed into metadata
+LAT = 38.8  # receiver station latitude -- echoed into metadata
+LON = -77.1  # receiver station longitude -- echoed into metadata
+RECEIVER_NAME = "Flex 6700"  # HamSCI/PSWS receiver name -- echoed into metadata
 STATION_UUID = "NoneAssigned"  # single station-identity string; used for the DRF dataset uuid_str and echoed into metadata
 NARROWBAND_RATE = 10           # HamSCI/PSWS narrow-band output rate (sps) -- same for every subchannel
 
@@ -143,10 +145,14 @@ class SettingsDialog(QDialog):
 
         self.rx_station_edit = QLineEdit(RX_STATION)
         self.grid_square_edit = QLineEdit(GRID_SQUARE)
+        self.lat_edit = QLineEdit(str(LAT))
+        self.lon_edit = QLineEdit(str(LON))
         self.receiver_name_edit = QLineEdit(RECEIVER_NAME)
         form.addRow("Receiver Station (callsign):", self.rx_station_edit)
         form.addRow("Grid Square:", self.grid_square_edit)
         form.addRow("Receiver Name:", self.receiver_name_edit)
+        form.addRow("Latitude:", self.lat_edit)
+        form.addRow("Longitude:", self.lon_edit)
 
         # One (TX station, frequency) row pair per configured channel.
         self.channel_widgets = []
@@ -177,9 +183,11 @@ class SettingsDialog(QDialog):
         self.setLayout(layout)
 
     def apply_to_globals(self):
-        global REC_DURATION, RX_STATION, GRID_SQUARE, RECEIVER_NAME
+        global REC_DURATION, RX_STATION, GRID_SQUARE, RECEIVER_NAME, LAT, LON
         RX_STATION    = self.rx_station_edit.text().strip()
         GRID_SQUARE   = self.grid_square_edit.text().strip()
+        LAT           = float(self.lat_edit.text().strip())
+        LON           = float(self.lon_edit.text().strip())
         RECEIVER_NAME = self.receiver_name_edit.text().strip()
         REC_DURATION  = self.spin_duration.value() * 3600
         # CAPTURE_CHANNELS entries are mutated in place -- no separate
@@ -402,8 +410,8 @@ def _write_metadata(sample_index, count):
                 [chan["carrier_freq_hz"] for chan in CAPTURE_CHANNELS], dtype=np.float64
             ),
             "grid_square": GRID_SQUARE,
-            "lat": np.float64(38.8),
-            "long": np.float64(-77.1),
+            "lat": np.float64(LAT),
+            "long": np.float64(LON),
             "receiver_name": RECEIVER_NAME,
             "uuid_str": STATION_UUID,
             "capture_start_sample": np.int64(start_global_index),
