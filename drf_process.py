@@ -19,6 +19,12 @@ DEFAULT_DRF_DIR = r"D:\\Data\\Ham Radio\\HAMSci Local Experiments"
 initial_dir = DEFAULT_DRF_DIR if os.path.isdir(DEFAULT_DRF_DIR) else os.path.expanduser("~")
 drf_path = QFileDialog.getExistingDirectory(None, "Select DRF Directory", initial_dir)
 
+# Short name for plot titles -- just the dataset folder, not the full path,
+# and without the "_narrowband_drf" suffix every capture script appends.
+drf_name = os.path.basename(os.path.normpath(drf_path))
+if drf_name.lower().endswith("_narrowband_drf"):
+    drf_name = drf_name[:-len("_narrowband_drf")]
+
 RUN_EXPERIMENTAL_VESSELIZATION = False  # if True, run the experimental multi-vessel tracking code below
 
 do = drf.DigitalRFReader(drf_path)
@@ -114,7 +120,7 @@ def process_subchannel(data, title_suffix):
     # those same bins, giving a visibly wider (and mismatched) range.
     clim_vmin, clim_vmax = im.get_clim()
     ax_spec.set_ylabel("Frequency (Hz)")
-    ax_spec.set_title(f"Spectrogram\n{drf_path}\n{title_suffix}")
+    ax_spec.set_title(f"Spectrogram\n{drf_name}\n{title_suffix}")
     # cax=ax_cbar (rather than ax=ax_spec) pins the colorbar to its own dedicated
     # grid cell, which only spans the top row -- so its height matches ax_spec
     # alone, while ax_spec and ax_mag stay the same width (same gridspec column).
@@ -406,7 +412,7 @@ def plot_all_subchannels(pxx_list, clim_list, freqs, bins):
 
     axes[-1].set_xlabel("Time (UTC)")
     axes[-1].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
-    fig.suptitle(f"All Subchannels\n{drf_path}")
+    fig.suptitle(f"All Subchannels\n{drf_name}")
     fig.autofmt_xdate()
     plt.show()
 
